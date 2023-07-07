@@ -40,20 +40,64 @@ while True:
         encodedData = data.encode()  # codigica os dados para enviar
         serverSocket.sendto(encodedData, clientAddress)  # envia os dados
     
+    # if decodedCommand[:3] == 'scp':
+    #     print('running command SCP...')
+    #     path_head_tail = os.path.split(decodedCommand[4:])
+    #     # procurar arquivo pra ver se ele existe
+    #     if not path_head_tail[0]:
+    #         # se for verdade o arquivo esta no diretorio atual
+    #         print(f'teste path: {os.getcwd() + path_head_tail[1]}')
+    #         exists = os.path.exists(os.getcwd() + path_head_tail[1])
+
+    #     print(f'teste path: {path_head_tail[0] + path_head_tail[1]}')
+    #     exists = os.path.exists(path_head_tail[0] + path_head_tail[1])
+        
+    #     if not exists:
+    #         data = "File doesn't exist." + '\n' + os.getcwd() + '$ ' # pega o diretorio atual e concatena com '>'
+    #         encodedData = data.encode()  # codigica os dados para enviar
+    #         serverSocket.sendto(encodedData, clientAddress)  # envia os dados
+
+    #     # pega nome do arquivo
+    #     arquivo = path_head_tail[1]  # pegando head (nome do arquivo)
+    #     serverSocket.sendto(arquivo.encode(), clientAddress)  # envia os dados
+
+    #     # caso exista inicia transação
+    #     # tam_pacote = 2048
+    #     with open(arquivo, 'rb') as arq:
+    #         while True:
+    #             pacote = arq.read(2048)
+    #             if not pacote:  # If the chunk is empty, we've reached the end of the file
+    #                 break
+    #             # data = os.getcwd() + '$ '  # pega o diretorio atual e concatena com '>'
+    #             # encodedData = data.encode()  # codigica os dados para enviar
+    #             serverSocket.sendto(pacote, clientAddress)  # envia os dados
+    #         arq.close()
+    #     data = os.getcwd() + '$ '
+    #     encodedData = data.encode()  # codigica os dados para enviar
+    #     serverSocket.sendto(encodedData, clientAddress)  # envia os dados
+
     if decodedCommand[:3] == 'scp':
-        # procurar arquivo pra ver se ele existe
+        print('Executando comando SCP...')
+        path_head_tail = os.path.split(decodedCommand[4:])
+        exists = os.path.exists(decodedCommand[4:])
 
-        # pega nome do arquivo
-        arquivo = ""
+        if not exists:
+            data = "Arquivo não existe." + '\n' + os.getcwd() + '$ '
+            encodedData = data.encode()
+            serverSocket.sendto(encodedData, clientAddress)
+        else:
+            arquivo = path_head_tail[1]
+            serverSocket.sendto(arquivo.encode(), clientAddress)
 
-        # caso exista inicia transação
-        tam_pacote = 2048
-        with open(arquivo, 'rb') as arq:
-            while True:
-                pacote = arq.read(tam_pacote)
-                if not pacote:  # If the chunk is empty, we've reached the end of the file
-                    break
-                # data = os.getcwd() + '$ '  # pega o diretorio atual e concatena com '>'
-                # encodedData = data.encode()  # codigica os dados para enviar
-                serverSocket.sendto(pacote, clientAddress)  # envia os dados
-                
+            with open(decodedCommand[4:], 'rb') as file:
+                while True:
+                    chunk = file.read(2048)
+                    serverSocket.sendto(chunk, clientAddress)
+                    if not chunk:
+                        break
+                    
+                file.close()
+
+            data = os.getcwd() + '$ '
+            encodedData = data.encode()
+            serverSocket.sendto(encodedData, clientAddress)
