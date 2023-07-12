@@ -7,42 +7,39 @@ serverPort = 12000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
 def send_commands():
+    # print waiting for command
     print(os.getcwd() + '$ ', end='')
     while True:
         command = input('')  # digita o comando
-
         if len(command) > 0:
             if command == 'quit':
                 break
             elif command[:3] == 'scp':
-                encodedCommand = command.encode("UTF-8")
-                clientSocket.sendto(encodedCommand, (serverName, serverPort))
+                # scp function
+                clientSocket.sendto(command.encode("UTF-8"), (serverName, serverPort))
                 confirmation, serverAddress = clientSocket.recvfrom(2048)
                 if confirmation.decode() == 'yes':
                     arquivo, serverAddress = clientSocket.recvfrom(2048)
-                    arquivo = arquivo.decode()
-
-                    with open(arquivo, 'wb') as file:
+                    with open(arquivo.decode(), 'wb') as file:
                         while True:
-                            chunk, serverAddress = clientSocket.recvfrom(2048)
-                            if not chunk:
+                            partialData, serverAddress = clientSocket.recvfrom(2048)
+                            if not partialData:
                                 break
-                            file.write(chunk)
+                            file.write(partialData)
                         file.close()
-
+                    # receive data, maybe create a function
                     data, serverAddress = clientSocket.recvfrom(2048)
-                    decodedData = data.decode()
-                    print(decodedData, end='')
+                    print(data.decode(), end='')
                 else:
                     print(confirmation.decode(), end='')
-
             else:
-                encodedCommand = command.encode("UTF-8")
-                clientSocket.sendto(encodedCommand, (serverName, serverPort))
+                clientSocket.sendto(command.encode("UTF-8"), (serverName, serverPort))
+
+                # receive data, maybe create a function
                 data, serverAddress = clientSocket.recvfrom(2048)
-                decodedData = data.decode()
-                print(decodedData, end='')
+                print(data.decode(), end='')
         else:
+            # print waiting for command
             print(os.getcwd() + '$ ', end='')
 
 send_commands()
