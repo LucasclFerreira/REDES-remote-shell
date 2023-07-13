@@ -1,58 +1,52 @@
 from socket import *
 import os
 
-serverName = '192.168.1.27'
-serverPort = 32007
+serverName = ''
+serverPort = 15003
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
 
-def send_commands():
-    print(os.getcwd() + '$ ', end='')
+def receive_data(sock):
+    bytes = b""
     while True:
-        command = input('')  # Enter the command
+        data = sock.recv(1024)
+        bytes += data
+        if not data:
+            break
+    return bytes
 
+def send_commands():
+    print('$ ', end='')
+    while True:
+        command = input('')  # digita o comando
         if len(command) > 0:
             if command == 'quit':
                 break
             elif command[:3] == 'scp':
-                encodedCommand = command.encode("UTF-8")
-                clientSocket.send(encodedCommand)
-                confirmation = clientSocket.recv(2048)
+                clientSocket.send(command.encode("UTF-8"))
+                confirmation = clientSocket.recv(1024)
                 if confirmation.decode() == 'yes':
-                    arquivo = clientSocket.recv(2048).decode()
-
-                    with open(arquivo, 'wb') as file:
+                    arquivo = clientSocket.recv(1024)
+                    with open(arquivo.decode(), 'wb') as file:
                         while True:
-                            chunk = clientSocket.recv(2048)
-                            if not chunk:
+                            partialData = clientSocket.recv(1024)
+                            if not partialData:
                                 break
-                            file.write(chunk)
+                            file.write(partialData)
                         file.close()
-
-                    # Receive the final response
-                    data = receive_complete_response(clientSocket)
-                    print(data, end='')
+                    data = clientSocket.recv(1024)
+                    print(data.decode(), end='')
                 else:
                     print(confirmation.decode(), end='')
-
             else:
-                encodedCommand = command.encode("UTF-8")
-                clientSocket.send(encodedCommand)
-                data = receive_complete_response(clientSocket)
-                print(data, end='')
+                clientSocket.send(command.encode())
+
+                # receive data, maybe create a function
+                data = clientSocket.recv(1024)
+                print(data.decode(), end='')
         else:
-            print(os.getcwd() + '$ ', end='')
-
-    clientSocket.close()
-
-def receive_complete_response(socket):
-    buffer_size = 4096  # Adjust the buffer size as needed
-    response = b""
-    while True:
-        chunk = socket.recv(buffer_size)
-        response += chunk
-        if len(chunk) < buffer_size:
-            break
-    return response.decode()
+            # print waiting for command
+            print('$ ', end='')
 
 send_commands()
+clientSocket.close()

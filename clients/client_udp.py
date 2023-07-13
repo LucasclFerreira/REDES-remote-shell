@@ -7,15 +7,13 @@ serverPort = 12000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
 def send_commands():
-    # print waiting for command
     print(os.getcwd() + '$ ', end='')
     while True:
-        command = input('')  # digita o comando
+        command = input('')
         if len(command) > 0:
             if command == 'quit':
                 break
             elif command[:3] == 'scp':
-                # scp function
                 clientSocket.sendto(command.encode("UTF-8"), (serverName, serverPort))
                 confirmation, serverAddress = clientSocket.recvfrom(2048)
                 if confirmation.decode() == 'yes':
@@ -27,19 +25,15 @@ def send_commands():
                                 break
                             file.write(partialData)
                         file.close()
-                    # receive data, maybe create a function
                     data, serverAddress = clientSocket.recvfrom(2048)
                     print(data.decode(), end='')
                 else:
                     print(confirmation.decode(), end='')
             else:
                 clientSocket.sendto(command.encode("UTF-8"), (serverName, serverPort))
-
-                # receive data, maybe create a function
                 data, serverAddress = clientSocket.recvfrom(2048)
                 print(data.decode(), end='')
         else:
-            # print waiting for command
             print(os.getcwd() + '$ ', end='')
 
 send_commands()
