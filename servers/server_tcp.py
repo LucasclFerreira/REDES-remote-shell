@@ -1,7 +1,8 @@
 from socket import *
 import os
+import time
 
-serverPort = 15003
+serverPort = 15005
 serverSocket = socket(AF_INET, SOCK_STREAM)
 serverSocket.bind(('', serverPort))
 serverSocket.listen()
@@ -37,23 +38,28 @@ try:
             if not os.path.exists(decodedCommand[4:]):
                 data = 'no such file in the directory\n'
                 data += '$ '
-                serverSocket.send(data.encode())
+                connectionSocket.send(data.encode())
             else:
+                print('preparing conf...')
+                time.sleep(1)
                 confirmation = 'yes'
-                serverSocket.send(confirmation.encode())
+                connectionSocket.send(confirmation.encode())
 
+                print('conf sent')
+                time.sleep(1)
                 file = os.path.split(decodedCommand[4:])[1]
-                serverSocket.send(file.encode())
+                connectionSocket.send(file.encode())
 
                 with open(decodedCommand[4:], 'rb') as file:
                     while True:
                         partialData = file.read(1024)
                         if not partialData:
+                            print('end of file reached')
                             break
-                        serverSocket.sendall(partialData)
+                        connectionSocket.sendall(partialData)
                     file.close()
                 data = '$ '
-                serverSocket.send(data.encode())
+                connectionSocket.send(data.encode())
         else:
             data = f'{decodedCommand}: command not found\n'
             data += '$ '

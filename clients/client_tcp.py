@@ -1,8 +1,9 @@
 from socket import *
 import os
+import time
 
 serverName = ''
-serverPort = 15003
+serverPort = 15005
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
 
@@ -12,6 +13,7 @@ def receive_data(sock):
         data = sock.recv(1024)
         bytes += data
         if not data:
+            print('end of data sent by the server')
             break
     return bytes
 
@@ -26,6 +28,9 @@ def send_commands():
                 clientSocket.send(command.encode("UTF-8"))
                 confirmation = clientSocket.recv(1024)
                 if confirmation.decode() == 'yes':
+                    
+                    print('conf received')
+                    time.sleep(1)
                     arquivo = clientSocket.recv(1024)
                     with open(arquivo.decode(), 'wb') as file:
                         while True:
