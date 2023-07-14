@@ -12,6 +12,7 @@ connectionSocket, clientAddress = serverSocket.accept()
 print(f'connected to address {clientAddress}')
 try:
     while True:
+        print('topo server')
         command = connectionSocket.recv(1024)
         decodedCommand = command.decode()
         if decodedCommand[:2] == 'cd':
@@ -42,22 +43,29 @@ try:
             else:
                 print('preparing conf...')
                 time.sleep(1)
-                confirmation = 'yes'
-                connectionSocket.send(confirmation.encode())
+                file_size = str(os.path.getsize(decodedCommand[4:]))
+                connectionSocket.send(file_size.encode())
+                ack = connectionSocket.recv(1024) 
 
-                print('conf sent')
-                time.sleep(1)
+                # print('conf sent')
+                # time.sleep(1)
                 file = os.path.split(decodedCommand[4:])[1]
                 connectionSocket.send(file.encode())
+                ack = connectionSocket.recv(1024)
 
+                file_size = int(file_size)  # transformando em inteiro novamente
                 with open(decodedCommand[4:], 'rb') as file:
-                    while True:
-                        partialData = file.read(1024)
-                        if not partialData:
-                            print('end of file reached')
-                            break
-                        connectionSocket.sendall(partialData)
-                    file.close()
+                    while file_size > 0:
+                        if file_size > 1024:
+                            partialData = file.read(1024)
+                            connectionSocket.sendall(partialData)
+                            file_size -= 1024
+                            ack = connectionSocket.recv(1024)  # esperando o client enviar um ack para proceder
+                        else:
+                            partialData = file.read(1024)
+                            connectionSocket.sendall(partialData)
+                            file_size -= file_size
+                            ack = connectionSocket.recv(1024)  # esperando o client enviar um ack para proceder
                 data = '$ '
                 connectionSocket.send(data.encode())
         else:
@@ -69,3 +77,5 @@ except BrokenPipeError:
     connectionSocket.close()
 finally:
     connectionSocket.close()
+
+# scp ../../../teste/teste-video.mp4
