@@ -37,18 +37,13 @@ try:
             connectionSocket.send(data.encode())
         elif decodedCommand[:3] == 'scp':
             if not os.path.exists(decodedCommand[4:]):
-                data = 'no such file in the directory\n'
-                data += '$ '
-                connectionSocket.send(data.encode())
+                file_size = 0
+                file_size = str(file_size)
+                connectionSocket.send(file_size.encode())
             else:
-                print('preparing conf...')
-                time.sleep(1)
                 file_size = str(os.path.getsize(decodedCommand[4:]))
                 connectionSocket.send(file_size.encode())
-                ack = connectionSocket.recv(1024) 
-
-                # print('conf sent')
-                # time.sleep(1)
+                ack = connectionSocket.recv(1024)
                 file = os.path.split(decodedCommand[4:])[1]
                 connectionSocket.send(file.encode())
                 ack = connectionSocket.recv(1024)
@@ -73,7 +68,8 @@ try:
             data += '$ '
             connectionSocket.send(data.encode())
 except BrokenPipeError:
-    print('BrokenPipeError occurred...')
+    print('BrokenPipeError')
+    print('Closing connection...')
     connectionSocket.close()
 finally:
     connectionSocket.close()

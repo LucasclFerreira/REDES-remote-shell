@@ -7,7 +7,7 @@ serverPort = 12000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
 def send_commands():
-    print(os.getcwd() + '$ ', end='')
+    print('$ ', end='')
     while True:
         command = input('')
         if len(command) > 0:
