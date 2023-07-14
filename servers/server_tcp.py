@@ -1,10 +1,15 @@
 from socket import *
 import os
 import time
+import sys
 
+# serverName = sys.argv[1]
+serverName = gethostname()
+serverAddress = gethostbyname(serverName)
+print(f'hostname: {serverName}; hostaddr: {serverAddress}')
 serverPort = 15005
 serverSocket = socket(AF_INET, SOCK_STREAM)
-serverSocket.bind(('', serverPort))
+serverSocket.bind((serverName, serverPort))
 serverSocket.listen()
 print('server ready to receive')
 

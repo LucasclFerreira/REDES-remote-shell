@@ -2,7 +2,7 @@ from socket import *
 import os
 import sys
 
-serverName = ''
+serverName = sys.argv[1]  # solve else
 serverPort = 12000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 

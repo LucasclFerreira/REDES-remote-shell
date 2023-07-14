@@ -2,9 +2,11 @@ from socket import *
 import os
 import sys
 
+serverName = gethostname()
+serverAddress = gethostbyname(serverName)
 serverPort = 12000
 serverSocket = socket(AF_INET, SOCK_DGRAM)
-serverSocket.bind(('', serverPort))
+serverSocket.bind((serverAddress, serverPort))
 print('server ready to receive')
 
 while True:

@@ -1,8 +1,8 @@
 from socket import *
-import os
+import sys
 import time
 
-serverName = ''
+serverName = sys.argv[1]
 serverPort = 15005
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
