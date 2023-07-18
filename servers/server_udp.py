@@ -3,12 +3,12 @@ import os
 import time
 import sys
 
-serverName = gethostname()
-serverAddress = gethostbyname(serverName)
-print(f'hostname: {serverName}; hostaddr: {serverAddress}')
+# serverName = gethostname()
+# serverAddress = gethostbyname(serverName)
+# print(f'hostname: {serverName}; hostaddr: {serverAddress}')
 serverPort = 15005
 serverSocket = socket(AF_INET, SOCK_DGRAM)
-serverSocket.bind((serverName, serverPort))
+serverSocket.bind(('', serverPort))
 
 print('server ready to receive')
 
