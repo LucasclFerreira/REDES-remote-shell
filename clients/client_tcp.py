@@ -7,16 +7,6 @@ serverPort = 15005
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
 
-def receive_data(sock):
-    bytes = b""
-    while True:
-        data = sock.recv(1024)
-        bytes += data
-        if not data:
-            print('end of data sent by the server')
-            break
-    return bytes
-
 def send_commands():
     print('$ ', end='')
     while True:
